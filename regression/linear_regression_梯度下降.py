@@ -1,7 +1,9 @@
 from sklearn.datasets import load_boston
-from sklearn.linear_model import LinearRegression, SGDRegressor
+from sklearn.linear_model import LinearRegression, SGDRegressor, Ridge
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+# 测试是否准确的包都在这个包里面
+from sklearn.metrics import mean_squared_error
 
 
 def my_linear():
@@ -30,19 +32,22 @@ def my_linear():
     y_train = std_y.fit_transform(y_train.reshape(-1, 1))
     y_test = std_y.transform(y_test.reshape(-1, 1))
 
-    # estimator预测
-    lr = LinearRegression()
+    # estimator预测,使用梯度下降
+    # 当数据量比较小的时候，用正规方程的方法会更加准确，
+    # 但是当数据量比较大的时候要用梯度下降
 
-    lr.fit(x_train, y_train)
+    sgd = SGDRegressor()
+    sgd.fit(x_train, y_train)
 
     # 打印参数，也就是很多w的值
-    print(lr.coef_)
+    print(sgd.coef_)
 
     # 在线性回归中不再用准确率评估
     # 预测测试集的房子价格
-    y_predict = std_y.inverse_transform(lr.predict(x_test))
+    y_predict = std_y.inverse_transform(sgd.predict(x_test))
 
-    print("测试集中额每个样本的测试价格：", y_predict)
+    print("梯度下降方法测试集中额每个样本的测试价格：", y_predict)
+    print("梯度下降方法中的均方误差：", mean_squared_error(std_y.inverse_transform(y_test), y_predict))
 
 
 if __name__ == '__main__':
